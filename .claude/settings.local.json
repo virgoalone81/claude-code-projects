@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth *)",
+      "Bash(brew --version)",
+      "Bash(git --version)",
+      "Bash(curl -sL https://github.com/cli/cli/releases/download/v2.72.0/gh_2.72.0_macOS_arm64.tar.gz -o /tmp/gh.tar.gz)",
+      "Bash(tar -xzf /tmp/gh.tar.gz -C /tmp)",
+      "Bash(/tmp/gh_2.72.0_macOS_arm64/bin/gh --version)",
+      "Read(//private/tmp/**)",
+      "Bash(curl -sI \"https://github.com/cli/cli/releases/latest\")",
+      "Bash(curl -L \"https://github.com/cli/cli/releases/download/v2.95.0/gh_2.95.0_macOS_arm64.tar.gz\" -o /tmp/gh.tar.gz)",
+      "Bash(find /usr/local /opt /Applications -name \"gh\" 2>/dev/null | head -5; find /usr/bin /bin -name \"gh\" 2>/dev/null)",
+      "Bash(gh --version)",
+      "Bash(ls /opt/homebrew/bin/ 2>/dev/null | grep -i gh; find /Applications /usr/local/opt -name \"gh\" 2>/dev/null | head -5)",
+      "Bash(ls /opt/homebrew/bin/ 2>/dev/null | head -20; ls /opt/homebrew/ 2>/dev/null)",
+      "Bash(/opt/homebrew/bin/brew install *)",
+      "Read(//Users/terrancewilburn/.config/**)",
+      "Read(//Users/terrancewilburn/.config/gh/**)",
+      "Bash(find ~ -name \"hosts.yml\" 2>/dev/null | grep gh)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ]
+  }
+}
