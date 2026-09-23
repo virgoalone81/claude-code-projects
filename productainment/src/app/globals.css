@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-ink: #0e0d0c;
+  --color-panel: #1a1816;
+  --color-line: #2e2a26;
+  --color-cream: #f4ede3;
+  --color-muted: #a39a8e;
+  --color-gold: #e8b04a;
+  --color-gold-dark: #c8912c;
+  --font-sans: var(--font-geist-sans);
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-cream);
+}
+
+.btn {
+  @apply inline-flex items-center justify-center rounded-full bg-gold px-6 py-3 font-semibold text-ink transition hover:bg-gold-dark disabled:opacity-50;
+}
+
+.btn-ghost {
+  @apply inline-flex items-center justify-center rounded-full border border-line px-5 py-2.5 text-sm text-cream transition hover:border-gold;
+}
+
+.field {
+  @apply w-full rounded-xl border border-line bg-panel px-4 py-3 text-cream placeholder:text-muted/60 focus:border-gold focus:outline-none;
+}
+
+.card {
+  @apply rounded-2xl border border-line bg-panel p-6;
+}
