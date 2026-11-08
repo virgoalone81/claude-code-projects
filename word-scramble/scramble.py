@@ -71,7 +71,7 @@ def play():
             try:
                 guess = input(f"  Guess {attempt}/{GUESSES} (or 'hint'): ").strip().lower()
             except KeyboardInterrupt:
-                print(f"\n\n  Final score: {wins}/{total} | Best streak recorded.\n")
+                print(f"\n\n  Final score: {wins}/{total} | Streak: {win_streak}\n")
                 return
 
             if guess in ("quit", "exit", "q"):
