@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { signOut } from "@/app/actions";
 import { Streak } from "@/components/Streak";
-import { FREE_DAYS, FREE_SONGS, PRICE_LABEL } from "@/lib/limits";
+import { FREE_DAYS, FREE_SONGS, FREE_TRIAL_SPOTS, PRICE_LABEL } from "@/lib/limits";
 import { requireUser } from "@/lib/supabase/server";
 
 export default async function Dashboard({ searchParams }: PageProps<"/dashboard">) {
@@ -10,13 +10,14 @@ export default async function Dashboard({ searchParams }: PageProps<"/dashboard"
   if (!user) redirect("/login");
 
   const [{ data: profile }, { data: songs }, { data: completions }] = await Promise.all([
-    supabase.from("profiles").select("is_pro").eq("id", user.id).single(),
+    supabase.from("profiles").select("is_pro, trial_eligible").eq("id", user.id).single(),
     supabase.from("songs").select("id, title, genre, release_date").order("created_at", { ascending: false }),
     supabase.from("completions").select("song_id, completed_on"),
   ]);
 
   const isPro = profile?.is_pro ?? false;
-  const canAddSong = isPro || (songs?.length ?? 0) < FREE_SONGS;
+  const freeWeek = profile?.trial_eligible ?? false;
+  const canAddSong = isPro || (freeWeek && (songs?.length ?? 0) < FREE_SONGS);
   const { upgraded } = await searchParams;
 
   return (
@@ -39,7 +40,7 @@ export default async function Dashboard({ searchParams }: PageProps<"/dashboard"
           )}
         </div>
 
-        {!songs?.length && (
+        {!songs?.length && canAddSong && (
           <div className="card text-muted">Add your first song to get your 30-day plan.</div>
         )}
 
@@ -70,15 +71,26 @@ export default async function Dashboard({ searchParams }: PageProps<"/dashboard"
               <button className="btn-ghost">Manage billing</button>
             </form>
           </>
-        ) : (
+        ) : freeWeek ? (
           <>
-            <h2 className="font-semibold">Free plan</h2>
+            <h2 className="font-semibold">Your free week</h2>
             <p className="text-sm text-muted">
-              {FREE_SONGS} song and the first {FREE_DAYS} days. Unlock all 30 days and unlimited songs for{" "}
-              {PRICE_LABEL}.
+              You got one of the first {FREE_TRIAL_SPOTS} spots: {FREE_SONGS} song and the first {FREE_DAYS} days
+              free. Unlock all 30 days and unlimited songs for {PRICE_LABEL}.
             </p>
             <form action="/api/stripe/checkout" method="post">
               <button className="btn">Unlock the full plan</button>
+            </form>
+          </>
+        ) : (
+          <>
+            <h2 className="font-semibold">Start your 30-day plan</h2>
+            <p className="text-sm text-muted">
+              The {FREE_TRIAL_SPOTS} free spots are taken. Get your full 30-day plan and unlimited songs for{" "}
+              {PRICE_LABEL}. Cancel anytime.
+            </p>
+            <form action="/api/stripe/checkout" method="post">
+              <button className="btn">Start the full plan</button>
             </form>
           </>
         )}

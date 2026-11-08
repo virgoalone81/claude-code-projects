@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { siteUrl } from "@/lib/env";
 import { stripe } from "@/lib/stripe";
 import { requireUser } from "@/lib/supabase/server";
 
@@ -12,7 +13,7 @@ export async function POST(request: NextRequest) {
     .eq("id", user.id)
     .single();
 
-  const site = process.env.NEXT_PUBLIC_SITE_URL!;
+  const site = siteUrl();
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     line_items: [{ price: process.env.STRIPE_PRICE_ID!, quantity: 1 }],

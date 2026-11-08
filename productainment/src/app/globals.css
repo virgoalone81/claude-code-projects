@@ -31,3 +31,20 @@ body {
 .card {
   @apply rounded-2xl border border-line bg-panel p-6;
 }
+
+.legal h2 {
+  @apply pt-4 text-xl font-semibold;
+}
+
+.legal p,
+.legal li {
+  @apply leading-relaxed text-cream/90;
+}
+
+.legal ul {
+  @apply list-disc space-y-2 pl-6;
+}
+
+.legal a {
+  @apply text-gold underline;
+}

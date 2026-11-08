@@ -11,10 +11,11 @@ type Props = {
   songId: string;
   task: PlanDay | null;
   locked: boolean;
+  hadFreeWeek: boolean;
   completions: { day: number; completed_on: string }[];
 };
 
-export function TodayCard({ songId, task, locked, completions }: Props) {
+export function TodayCard({ songId, task, locked, hadFreeWeek, completions }: Props) {
   const today = useSyncExternalStore(subscribe, () => localDateString(), () => null);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState("");
@@ -44,8 +45,14 @@ export function TodayCard({ songId, task, locked, completions }: Props) {
     return (
       <div className="card space-y-3 border-gold">
         <p className="text-sm font-semibold uppercase tracking-widest text-gold">Day {task.day}</p>
-        <h2 className="text-2xl font-bold">You finished your free week.</h2>
-        <p className="text-muted">Unlock the rest of your plan to keep your streak going.</p>
+        <h2 className="text-2xl font-bold">
+          {hadFreeWeek ? "You finished your free week." : "Your plan is waiting."}
+        </h2>
+        <p className="text-muted">
+          {hadFreeWeek
+            ? "Unlock the rest of your plan to keep your streak going."
+            : "Unlock the full plan to start posting today."}
+        </p>
         <form action="/api/stripe/checkout" method="post">
           <button className="btn">Unlock the full plan</button>
         </form>

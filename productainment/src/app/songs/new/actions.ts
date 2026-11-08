@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { FREE_SONGS } from "@/lib/limits";
+import { FREE_SONGS, FREE_TRIAL_SPOTS } from "@/lib/limits";
 import { generatePlan, type SongInput } from "@/lib/plan";
 import { requireUser } from "@/lib/supabase/server";
 
@@ -22,11 +22,16 @@ export async function createSong(_prev: CreateSongState, formData: FormData): Pr
   }
 
   const [{ data: profile }, { count }] = await Promise.all([
-    supabase.from("profiles").select("is_pro").eq("id", user.id).single(),
+    supabase.from("profiles").select("is_pro, trial_eligible").eq("id", user.id).single(),
     supabase.from("songs").select("id", { count: "exact", head: true }),
   ]);
-  if (!profile?.is_pro && (count ?? 0) >= FREE_SONGS) {
-    return { error: "The free plan covers one song. Unlock the full plan to add more." };
+  if (!profile?.is_pro) {
+    if (!profile?.trial_eligible) {
+      return { error: `The ${FREE_TRIAL_SPOTS} free spots are taken. Unlock the full plan to build this plan.` };
+    }
+    if ((count ?? 0) >= FREE_SONGS) {
+      return { error: "Your free week covers one song. Unlock the full plan to add more." };
+    }
   }
 
   let plan;

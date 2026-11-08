@@ -12,17 +12,19 @@ export default async function SongPage({ params }: PageProps<"/songs/[id]">) {
 
   const [{ data: song }, { data: profile }, { data: allCompletions }] = await Promise.all([
     supabase.from("songs").select("id, title, genre, release_date, plan").eq("id", id).maybeSingle(),
-    supabase.from("profiles").select("is_pro").eq("id", user.id).single(),
+    supabase.from("profiles").select("is_pro, trial_eligible").eq("id", user.id).single(),
     supabase.from("completions").select("song_id, day, completed_on"),
   ]);
   if (!song) notFound();
 
   const isPro = profile?.is_pro ?? false;
+  // Only the first 10 sign-ups get the free week. Everyone else needs the full plan.
+  const freeDays = profile?.trial_eligible ? FREE_DAYS : 0;
   const plan = song.plan as PlanDay[];
   const completions = (allCompletions ?? []).filter((c) => c.song_id === song.id);
   const doneDays = new Set(completions.map((c) => c.day));
   const task = plan.find((d) => !doneDays.has(d.day)) ?? null;
-  const locked = !!task && task.day > FREE_DAYS && !isPro;
+  const locked = !!task && task.day > freeDays && !isPro;
 
   return (
     <div className="space-y-8 pt-6">
@@ -39,6 +41,7 @@ export default async function SongPage({ params }: PageProps<"/songs/[id]">) {
         songId={song.id}
         task={locked ? { ...task!, hook: "", film: "", caption: "", confidence: "" } : task}
         locked={locked}
+        hadFreeWeek={freeDays > 0}
         completions={completions}
       />
 
@@ -47,7 +50,7 @@ export default async function SongPage({ params }: PageProps<"/songs/[id]">) {
         <ol className="grid gap-2">
           {plan.map((d) => {
             const done = doneDays.has(d.day);
-            const hidden = d.day > FREE_DAYS && !isPro;
+            const hidden = d.day > freeDays && !isPro;
             return (
               <li
                 key={d.day}

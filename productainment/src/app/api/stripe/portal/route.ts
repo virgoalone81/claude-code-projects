@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { siteUrl } from "@/lib/env";
 import { stripe } from "@/lib/stripe";
 import { requireUser } from "@/lib/supabase/server";
 
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
 
   const session = await stripe.billingPortal.sessions.create({
     customer: profile.stripe_customer_id,
-    return_url: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard`,
+    return_url: `${siteUrl()}/dashboard`,
   });
   return NextResponse.redirect(session.url, 303);
 }
